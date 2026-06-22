@@ -326,6 +326,155 @@
             font-size: 0.9rem;
             line-height: 1.4;
         }
+
+        /* Privacy Safe Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #888;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--metallic-gold);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            background-color: #000;
+        }
+
+        .privacy-label {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            color: var(--text-light) !important;
+        }
+
+        .privacy-label .hint {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .btn-safe.locked {
+            color: #888;
+            border-color: #444;
+        }
+
+        .btn-safe.unlocked {
+            background: rgba(197, 160, 89, 0.15);
+            box-shadow: 0 0 12px rgba(197, 160, 89, 0.2);
+        }
+
+        .safe-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #444;
+            z-index: 5;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .safe-placeholder.visible {
+            opacity: 1;
+        }
+
+        .safe-placeholder .lock-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .safe-placeholder .placeholder-text {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            color: #555;
+        }
+
+        .private-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--metallic-gold);
+            background: rgba(197, 160, 89, 0.1);
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            color: white;
+            font-family: inherit;
+            border-radius: 4px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--metallic-gold);
+        }
+
+        .modal-hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .modal-error {
+            color: #FF6B6B;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+        }
+
+        .controls-divider {
+            width: 1px;
+            background: var(--glass-border);
+            margin: 0 0.3rem;
+        }
     </style>
     <!-- Import Maps for Three.js ES Modules -->
     <script type="importmap">
@@ -356,6 +505,11 @@
         <p>初始化银河引擎...<br><span id="loader-text" style="font-size: 0.8rem; color: #888;">请允许摄像头权限以开启手势交互</span></p>
     </div>
 
+    <div class="safe-placeholder" id="safe-placeholder">
+        <div class="lock-icon">🔒</div>
+        <div class="placeholder-text">· · · QUIET · · ·</div>
+    </div>
+
     <div class="ui-layer">
         <div class="header">
             <div class="title-block">
@@ -363,6 +517,20 @@
                 <p>人生轨迹银河 · 你的专属时空</p>
             </div>
             <div class="controls">
+                <button class="btn btn-safe locked" id="safe-toggle-btn" title="保险箱模式">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span id="safe-btn-text">保险箱已锁</span>
+                </button>
+                <div class="controls-divider"></div>
+                <button class="btn" id="export-btn" title="导出公开版本">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    导出公开版
+                </button>
+                <div class="controls-divider"></div>
                 <button class="btn" id="add-event-btn">
                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -413,6 +581,18 @@
                     <label>描述</label>
                     <textarea id="event-desc" rows="3" placeholder="这一刻发生了什么..."></textarea>
                 </div>
+                <div class="form-group">
+                    <label class="privacy-label">
+                        <span class="toggle-switch">
+                            <input type="checkbox" id="event-private">
+                            <span class="toggle-slider"></span>
+                        </span>
+                        <div>
+                            <div>仅本机可见 · 存入保险箱</div>
+                            <div class="hint">导出公开版时将自动跳过此内容</div>
+                        </div>
+                    </label>
+                </div>
                 <button type="submit" class="submit-btn" id="submit-btn">注入银河</button>
             </form>
         </div>
@@ -426,6 +606,30 @@
         <h3 class="event-title" id="card-title">Event Title</h3>
         <p class="event-date" id="card-date">2023.01.01</p>
         <p class="event-desc" id="card-desc">Event description goes here.</p>
+    </div>
+
+    <!-- Password Modal (Setup / Verify) -->
+    <div class="modal" id="password-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-password-modal">&times;</span>
+            <h2 id="password-modal-title" style="color: var(--metallic-gold); margin-bottom: 1.5rem; font-family: 'Cinzel';">开启保险箱</h2>
+            <form id="password-form">
+                <div class="form-group">
+                    <label id="password-label">输入口令</label>
+                    <input type="password" class="password-input" id="password-input" placeholder="请输入口令" required>
+                </div>
+                <div class="form-group" id="confirm-password-group" style="display:none;">
+                    <label>确认口令</label>
+                    <input type="password" class="password-input" id="password-confirm" placeholder="请再次输入口令">
+                </div>
+                <div class="modal-error" id="password-error"></div>
+                <div class="modal-hint" id="password-hint">
+                    口令仅保存在本浏览器，用于解锁保险箱内容。<br>
+                    忘记口令需清除浏览器数据重置。
+                </div>
+                <button type="submit" class="submit-btn" id="password-submit-btn">确认</button>
+            </form>
+        </div>
     </div>
 
     <script type="module">
@@ -454,8 +658,134 @@
             targetSpeed: 0.2,
             interactionMode: 'none', // none, rotate, zoom
             events: [],
-            handPresent: false
+            handPresent: false,
+            safeUnlocked: false,
+            hasPassword: false,
+            passwordMode: 'verify'
         };
+
+        const SAFE_STORAGE_KEY = 'lifegalaxy_safe_password';
+        const EVENTS_STORAGE_KEY = 'lifegalaxy_events';
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return 'h_' + Math.abs(hash).toString(16);
+        }
+
+        function hasStoredPassword() {
+            return !!localStorage.getItem(SAFE_STORAGE_KEY);
+        }
+
+        function verifyPassword(input) {
+            const stored = localStorage.getItem(SAFE_STORAGE_KEY);
+            if (!stored) return false;
+            return simpleHash(input) === stored;
+        }
+
+        function setPassword(input) {
+            localStorage.setItem(SAFE_STORAGE_KEY, simpleHash(input));
+        }
+
+        function getPublicEvents() {
+            return STATE.events.filter(e => !e.isPrivate);
+        }
+
+        function getVisibleEvents() {
+            return STATE.safeUnlocked ? STATE.events : getPublicEvents();
+        }
+
+        function saveEventsToStorage() {
+            try {
+                const serializable = STATE.events.map(e => ({
+                    ...e,
+                    src: e.isPrivate ? e.src : (e.src.startsWith('blob:') ? null : e.src)
+                }));
+                localStorage.setItem(EVENTS_STORAGE_KEY, JSON.stringify(serializable));
+            } catch (e) {
+                console.warn('Failed to save events:', e);
+            }
+        }
+
+        function loadEventsFromStorage() {
+            try {
+                const raw = localStorage.getItem(EVENTS_STORAGE_KEY);
+                if (raw) {
+                    STATE.events = JSON.parse(raw).filter(e => e && e.title);
+                }
+            } catch (e) {
+                console.warn('Failed to load events:', e);
+            }
+        }
+
+        function updateSafeUI() {
+            const btn = document.getElementById('safe-toggle-btn');
+            const btnText = document.getElementById('safe-btn-text');
+            const placeholder = document.getElementById('safe-placeholder');
+            const addBtn = document.getElementById('add-event-btn');
+
+            if (STATE.safeUnlocked) {
+                btn.classList.remove('locked');
+                btn.classList.add('unlocked');
+                btnText.textContent = '保险箱已开';
+                placeholder.classList.remove('visible');
+                addBtn.style.opacity = '1';
+                addBtn.style.filter = '';
+                addBtn.title = '';
+            } else {
+                btn.classList.add('locked');
+                btn.classList.remove('unlocked');
+                btnText.textContent = '保险箱已锁';
+                addBtn.style.opacity = '0.5';
+                addBtn.style.filter = 'grayscale(0.5)';
+                addBtn.title = '需先解锁保险箱';
+
+                const visibleCount = getVisibleEvents().length;
+                if (visibleCount === 0 && STATE.events.length > 0) {
+                    placeholder.classList.add('visible');
+                } else {
+                    placeholder.classList.remove('visible');
+                }
+            }
+        }
+
+        function openPasswordModal() {
+            const passwordError = document.getElementById('password-error');
+            const passwordInput = document.getElementById('password-input');
+            const passwordConfirm = document.getElementById('password-confirm');
+            const passwordModalTitle = document.getElementById('password-modal-title');
+            const passwordLabel = document.getElementById('password-label');
+            const confirmGroup = document.getElementById('confirm-password-group');
+            const passwordHint = document.getElementById('password-hint');
+            const passwordSubmitBtn = document.getElementById('password-submit-btn');
+            const passwordModal = document.getElementById('password-modal');
+
+            passwordError.textContent = '';
+            passwordInput.value = '';
+            passwordConfirm.value = '';
+
+            if (hasStoredPassword()) {
+                STATE.passwordMode = 'verify';
+                passwordModalTitle.textContent = '开启保险箱';
+                passwordLabel.textContent = '输入口令';
+                confirmGroup.style.display = 'none';
+                passwordHint.style.display = 'block';
+                passwordSubmitBtn.textContent = '解锁';
+            } else {
+                STATE.passwordMode = 'setup';
+                passwordModalTitle.textContent = '设置保险箱口令';
+                passwordLabel.textContent = '新设口令';
+                confirmGroup.style.display = 'block';
+                passwordHint.style.display = 'block';
+                passwordSubmitBtn.textContent = '设置并解锁';
+            }
+            passwordModal.classList.add('active');
+            setTimeout(() => passwordInput.focus(), 100);
+        }
 
         // --- SCENE SETUP ---
         const container = document.getElementById('canvas-container');
@@ -604,6 +934,60 @@
         // --- LIFE EVENTS (Special Particles) ---
         const eventGroup = new THREE.Group();
         scene.add(eventGroup);
+
+        function clearEventGroup() {
+            while (eventGroup.children.length > 0) {
+                const child = eventGroup.children[0];
+                if (child.geometry) child.geometry.dispose();
+                if (child.material) child.material.dispose();
+                eventGroup.remove(child);
+            }
+            scene.children = scene.children.filter(c => c.type !== 'PointLight' || !c.userData.isEventLight);
+        }
+
+        function rebuildEventGalaxy() {
+            clearEventGroup();
+            const visibleEvents = getVisibleEvents();
+            visibleEvents.forEach((data, idx) => {
+                const count = idx;
+                const radius = 10 + (count * 5);
+                const angle = count * 0.5;
+
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                const y = (Math.random() - 0.5) * 5;
+
+                const color = data.color || (data.mediaType === 'video' ? '#00F0FF' : '#FFD700');
+
+                const starGeo = new THREE.SphereGeometry(2.5, 32, 32);
+                const starMat = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color(color),
+                    toneMapped: false
+                });
+                const star = new THREE.Mesh(starGeo, starMat);
+                star.position.set(x, y, z);
+
+                const ringGeo = new THREE.RingGeometry(3.0, 3.2, 32);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color(color),
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.6,
+                    toneMapped: false
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.lookAt(0, 0, 0);
+                star.add(ring);
+
+                const light = new THREE.PointLight(new THREE.Color(color), 5, 40);
+                light.position.set(x, y, z);
+                light.userData.isEventLight = true;
+                scene.add(light);
+
+                star.userData = { isEvent: true, data: data, ring: ring };
+                eventGroup.add(star);
+            });
+        }
 
         function addLifeEventToGalaxy(data, dominatColor) {
             // Calculate a position on the outer edge or next "step" of the spiral
@@ -819,6 +1203,10 @@
         const form = document.getElementById('event-form');
 
         addBtn.addEventListener('click', () => {
+            if (!STATE.safeUnlocked) {
+                openPasswordModal();
+                return;
+            }
             modal.classList.add('active');
         });
 
@@ -893,6 +1281,10 @@
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            if (!STATE.safeUnlocked) {
+                alert('请先解锁保险箱后再添加记忆节点');
+                return;
+            }
             const btn = document.getElementById('submit-btn');
             btn.innerText = "提取特征中...";
 
@@ -900,36 +1292,41 @@
             const date = document.getElementById('event-date').value;
             const desc = document.getElementById('event-desc').value;
             const fileInput = document.getElementById('event-file');
+            const isPrivate = document.getElementById('event-private').checked;
 
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
                 const isVideo = file.type.startsWith('video');
-                // Use ObjectURL for better performance (especially for videos)
                 const mediaSrc = URL.createObjectURL(file);
 
                 const data = {
                     title, date, desc,
                     mediaType: isVideo ? 'video' : 'image',
-                    src: mediaSrc
+                    src: mediaSrc,
+                    isPrivate: isPrivate
                 };
 
                 if (isVideo) {
-                    // For video, use a distinct Neon Cyan color to contrast
-                    addLifeEventToGalaxy(data, new THREE.Color('#00F0FF'));
+                    data.color = '#00F0FF';
                     STATE.events.push(data);
+                    rebuildEventGalaxy();
+                    saveEventsToStorage();
+                    updateSafeUI();
 
                     modal.classList.remove('active');
                     btn.innerText = "注入银河";
                     form.reset();
                 } else {
-                    // For image, we extract color
                     const img = new Image();
                     img.src = mediaSrc;
                     img.onload = () => {
                         const color = extractColor(img);
+                        data.color = color;
 
-                        addLifeEventToGalaxy(data, new THREE.Color(color));
                         STATE.events.push(data);
+                        rebuildEventGalaxy();
+                        saveEventsToStorage();
+                        updateSafeUI();
 
                         modal.classList.remove('active');
                         btn.innerText = "注入银河";
@@ -943,8 +1340,13 @@
             const card = document.getElementById('event-card');
             const img = document.getElementById('card-img');
             const vid = document.getElementById('card-video');
+            const titleEl = document.getElementById('card-title');
 
-            document.getElementById('card-title').innerText = data.title;
+            let titleHtml = data.title;
+            if (data.isPrivate) {
+                titleHtml += '<span class="private-indicator">🔒 仅本机</span>';
+            }
+            titleEl.innerHTML = titleHtml;
             document.getElementById('card-date').innerText = data.date;
             document.getElementById('card-desc').innerText = data.desc;
 
@@ -953,12 +1355,11 @@
                 img.style.display = 'block';
                 vid.style.display = 'none';
                 vid.pause();
-                vid.src = ""; // Unload video
+                vid.src = "";
             } else {
                 img.style.display = 'none';
                 vid.src = data.src;
                 vid.style.display = 'block';
-                // Explicitly call load and play
                 vid.load();
                 vid.play().catch(e => console.warn("Auto-play blocked:", e));
             }
@@ -971,6 +1372,100 @@
             const vid = document.getElementById('card-video');
             vid.pause();
         }
+
+        // --- SAFE TOGGLE & PASSWORD MODAL ---
+        const safeToggleBtn = document.getElementById('safe-toggle-btn');
+        const passwordModal = document.getElementById('password-modal');
+        const closePasswordModal = document.getElementById('close-password-modal');
+        const passwordForm = document.getElementById('password-form');
+        const passwordInput = document.getElementById('password-input');
+        const passwordConfirm = document.getElementById('password-confirm');
+        const passwordError = document.getElementById('password-error');
+
+        safeToggleBtn.addEventListener('click', () => {
+            if (STATE.safeUnlocked) {
+                STATE.safeUnlocked = false;
+                hideEventCard();
+                rebuildEventGalaxy();
+                updateSafeUI();
+            } else {
+                openPasswordModal();
+            }
+        });
+
+        closePasswordModal.addEventListener('click', () => {
+            passwordModal.classList.remove('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === passwordModal) passwordModal.classList.remove('active');
+        });
+
+        passwordForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pw = passwordInput.value;
+            passwordError.textContent = '';
+
+            if (STATE.passwordMode === 'setup') {
+                const pw2 = passwordConfirm.value;
+                if (!pw || pw.length < 4) {
+                    passwordError.textContent = '口令至少需要 4 个字符';
+                    return;
+                }
+                if (pw !== pw2) {
+                    passwordError.textContent = '两次输入的口令不一致';
+                    return;
+                }
+                setPassword(pw);
+                STATE.hasPassword = true;
+                STATE.safeUnlocked = true;
+                passwordModal.classList.remove('active');
+                rebuildEventGalaxy();
+                updateSafeUI();
+            } else {
+                if (verifyPassword(pw)) {
+                    STATE.safeUnlocked = true;
+                    passwordModal.classList.remove('active');
+                    rebuildEventGalaxy();
+                    updateSafeUI();
+                } else {
+                    passwordError.textContent = '口令不正确';
+                }
+            }
+        });
+
+        // --- EXPORT PUBLIC VERSION ---
+        const exportBtn = document.getElementById('export-btn');
+        exportBtn.addEventListener('click', () => {
+            const publicEvents = getPublicEvents();
+            const exportData = {
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+                events: publicEvents.map(e => ({
+                    title: e.title,
+                    date: e.date,
+                    desc: e.desc,
+                    mediaType: e.mediaType,
+                    color: e.color
+                }))
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `lifegalaxy-public-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // --- INITIALIZATION ---
+        STATE.hasPassword = hasStoredPassword();
+        loadEventsFromStorage();
+        rebuildEventGalaxy();
+        updateSafeUI();
 
         // Window resize
         window.addEventListener('resize', () => {
